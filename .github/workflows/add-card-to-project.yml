@@ -1,21 +1,21 @@
-name: Add Issue to project
+name: Add issue to project
 on:
- issues:
-    types: [opened]
-    
+  issues:
+    types:
+      - opened
 jobs:
   track_issue:
     runs-on: ubuntu-latest
     steps:
       - name: Get project data
         env:
-          GITHUB_TOKEN: ${{secrets.ADD_ISSUES_TO_PROJECT}}
+          GITHUB_TOKEN: ${{ secrets.ADD_ISSUES_TO_PROJECT }}
           ORGANIZATION: WikidataComplete
           PROJECT_NUMBER: 1
         run: |
-          gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($account: String!, $number: Int!) {
-              user(login: $account){
+          gh api graphql -f query='
+            query($org: String!, $number: Int!) {
+              organization(login: $org){
                 projectNext(number: $number) {
                   id
                   fields(first:20) {
@@ -27,24 +27,20 @@ jobs:
                   }
                 }
               }
-            }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
-            
-          echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
-          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="Todo") |.id' project_data.json) >> $GITHUB_ENV
-      - name: Add Issue to project
+            }' -f org=$ORGANIZATION -F number=$PROJECT_NUMBER > project_data.json
+
+          echo 'PROJECT_ID='$(jq '.data.organization.projectNext.id' project_data.json) >> $GITHUB_ENV
+                    
+      - name: Add issue to project
         env:
-          GITHUB_TOKEN: ${{secrets.FOR_BETA_PROJECT_AUTO_ISSUES}}
+          GITHUB_TOKEN: ${{ secrets.ADD_ISSUES_TO_PROJECT }}
           ISSUE_ID: ${{ github.event.issue.node_id }}
         run: |
-          item_id="$( gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
+          item_id="$( gh api graphql -f query='
             mutation($project:ID!, $issue:ID!) {
               addProjectNextItem(input: {projectId: $project, contentId: $issue}) {
                 projectNextItem {
                   id
                 }
               }
-            }' -f project=$PROJECT_ID -f issue=$ISSUE_ID --jq '.data.addProjectNextItem.projectNextItem.id')"
-          
-          echo 'ITEM_ID='$item_id >> $GITHUB_ENV
+            }' -f project=$PROJECT_ID -f issue=$ISSUE_ID --jq '.data.addProjectNextItem.projectNextItem.id')"   
