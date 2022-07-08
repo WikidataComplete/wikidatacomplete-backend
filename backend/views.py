@@ -2,9 +2,10 @@ import requests
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from backend.constants import ACCEPT_CORRECTION, REJECT_CORRECTION, USER_COOKIE
 from backend.models import Fact
 from backend.serializers import FactListCreateSerializer
-from backend.constants import USER_COOKIE, ACCEPT_CORRECTION, REJECT_CORRECTION
 
 
 class FactListCreateAPI(generics.ListCreateAPIView):
@@ -12,24 +13,24 @@ class FactListCreateAPI(generics.ListCreateAPIView):
     serializer_class = FactListCreateSerializer
 
 
-class FactRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class FactRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Fact.objects.all()
     serializer_class = FactListCreateSerializer
 
 
-class RetrieveFactWithQId(APIView):
+class RetrieveFactWithQIdAPI(APIView):
     def get(self, request, *args, **kwargs):
         qid = self.kwargs.get("qid")
         try:
             response = requests.get(
                 f"https://qanswer-svc3.univ-st-etienne.fr/facts/get?qid={qid}&format=json"
             ).json()
-        except Exception as e:
+        except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(response, status=status.HTTP_200_OK)
 
 
-class RetrieveRandomFact(APIView):
+class RetrieveRandomFactAPI(APIView):
     def get(self, request, *args, **kwargs):
         try:
             response = requests.get(
