@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from backend.constants import ACCEPT_CORRECTION, REJECT_CORRECTION, USER_COOKIE
 from backend.models import Fact
 from backend.serializers import FactListCreateSerializer
+from random import choice
 
 
 class FactListCreateAPI(generics.ListCreateAPIView):
@@ -22,23 +23,66 @@ class RetrieveFactWithQIdAPI(APIView):
     def get(self, request, *args, **kwargs):
         qid = self.kwargs.get("qid")
         try:
-            response = requests.get(
-                f"https://qanswer-svc3.univ-st-etienne.fr/facts/get?qid={qid}&format=json"
-            ).json()
+            custom_response = []
+            facts_qs = Fact.objects.filter(wikidata_entity__endswith=qid)
+            for fact in facts_qs:
+                evidence_highlight = fact.evidence_highlight
+                references = fact.references
+                for refer in references:
+                    if refer.get("type") == "string":
+                        evidence = refer.get("value")
+                    elif refer.get("type") == "url":
+                        wikipedia_link = refer.get("value")
+                custom_response.append(
+                    {
+                        "id": fact.id,
+                        "property": fact.wikidata_property,
+                        "question": fact.question,
+                        "wikipediaLink": wikipedia_link,
+                        "wikidataLink": fact.wikidata_entity,
+                        "text": evidence_highlight.get("text"),
+                        "evidence": evidence,
+                        "startIdx": evidence_highlight.get("startIdx"),
+                        "endIdx": evidence_highlight.get("endIdx"),
+                        "object": fact.data_value,
+                    }
+                )
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        return Response(response, status=status.HTTP_200_OK)
+        return Response(custom_response, status=status.HTTP_200_OK)
 
 
 class RetrieveRandomFactAPI(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            response = requests.get(
-                "https://qanswer-svc3.univ-st-etienne.fr/fact/get?id=EMPTY&category=EMPTY&property=EMPTY"
-            ).json()
+            pk_list = Fact.objects.values_list("pk", flat=True)
+            random_pk = choice(pk_list)
+            fact = Fact.objects.get(pk=random_pk)
+            evidence_highlight = fact.evidence_highlight
+            references = fact.references
+            for refer in references:
+                if refer.get("type") == "string":
+                    evidence = refer.get("value")
+                elif refer.get("type") == "url":
+                    wikipedia_link = refer.get("value")
+            custom_response = [
+                {
+                    "id": fact.id,
+                    "property": fact.wikidata_property,
+                    "question": fact.question,
+                    "wikipediaLink": wikipedia_link,
+                    "wikidataLink": fact.wikidata_entity,
+                    "text": evidence_highlight.get("text"),
+                    "evidence": evidence,
+                    "startIdx": evidence_highlight.get("startIdx"),
+                    "endIdx": evidence_highlight.get("endIdx"),
+                    "object": fact.data_value,
+                }
+            ]
+
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        return Response(response, status=status.HTTP_200_OK)
+        return Response(custom_response, status=status.HTTP_200_OK)
 
 
 class FactAcceptAPI(APIView):
@@ -49,8 +93,7 @@ class FactAcceptAPI(APIView):
                 {"detail": "Invalid Fact ID."}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            accept_uri = f"https://qanswer-svc3.univ-st-etienne.fr/fact/correct?userCookie={USER_COOKIE}&factId={fact_id}&correction={ACCEPT_CORRECTION}"
-            requests.post(accept_uri)  # returns text data
+            pass
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(
@@ -66,8 +109,7 @@ class FactRejectAPI(APIView):
                 {"detail": "Invalid Fact ID."}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            reject_uri = f"https://qanswer-svc3.univ-st-etienne.fr/fact/correct?userCookie={USER_COOKIE}&factId={fact_id}&correction={REJECT_CORRECTION}"
-            requests.post(reject_uri)  # returns text data
+            pass
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(
