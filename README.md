@@ -1,10 +1,11 @@
 # WikidataComplete-Backend
 
-## Local Setup
+## Local Setup (using python 3.6)
 
 - Git clone (`git clone https://github.com/WikidataComplete/wikidatacomplete-backend.git`)
 - `cd wikidatacomplete-backend`
 - Setup virtual environment (`python3 -m venv env .`)
+- Activate virtual environment (`source env/bin/activate`)
 - Install requirements (`pip install -r requirements.txt`)
 - Create env file `touch .env`
 - Add these variables inside env file:
