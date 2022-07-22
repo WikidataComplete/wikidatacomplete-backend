@@ -11,8 +11,7 @@
 - Add these variables inside env file:
 
 ```
-DB_NAME=""
-DEBUG=True/False
+DEBUG=True/False (have 1 value either True or False)
 SECRET_KEY=""
 ```
 
