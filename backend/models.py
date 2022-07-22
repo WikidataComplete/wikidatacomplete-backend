@@ -1,5 +1,4 @@
 import uuid
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -11,10 +10,10 @@ class Fact(models.Model):
     candidate_created_at = models.DateTimeField(auto_now_add=True)
     wikidata_entity = models.URLField(blank=True, default="")
     wikidata_property = models.CharField(max_length=100, blank=True, default="")
-    data_value = ArrayField(models.JSONField(), default=list)
+    data_value = models.JSONField(default=list)
     data_type = models.CharField(max_length=100, blank=True, default="")
     qualifiers = models.JSONField(default=dict)
-    references = ArrayField(models.JSONField(), default=list)
+    references = models.JSONField(default=list)
     shown_to_editors = models.IntegerField(default=0)
     confirmed_at = models.DateTimeField(auto_now=True)
     evidence_highlight = models.JSONField(default=dict)
