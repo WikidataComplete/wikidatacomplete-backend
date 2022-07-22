@@ -1,6 +1,6 @@
 # WikidataComplete-Backend
 
-## Local Setup (using python 3.6)
+## Local Setup (using python 3.7)
 
 - Git clone (`git clone https://github.com/WikidataComplete/wikidatacomplete-backend.git`)
 - `cd wikidatacomplete-backend`
