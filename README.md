@@ -12,8 +12,6 @@
 
 ```
 DB_NAME=""
-DB_USER=""
-DB_PASSWORD=""
 DEBUG=True/False
 SECRET_KEY=""
 ```
