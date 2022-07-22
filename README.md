@@ -12,7 +12,7 @@
 
 ```
 DEBUG=True/False (have 1 value either True or False)
-SECRET_KEY=""
+SECRET_KEY=""    (use django project secret key here, can be generated via https://djecrety.ir/)
 ```
 
 - Run migrations (`python manage.py makemigrations`, `python manage.py migrate`)
