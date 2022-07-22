@@ -17,6 +17,7 @@ SECRET_KEY=""
 
 - Run migrations (`python manage.py makemigrations`, `python manage.py migrate`)
 - Run server (`python manage.py runserver`)
+- Run custom management command to populate data (`python manage.py transfer_old_facts`)
 - See it running on http://localhost:8000/api/v1/facts/
 
 ## API Docs
