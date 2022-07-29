@@ -25,7 +25,9 @@ class RetrieveFactWithQIdAPI(APIView):
             facts_qs = Fact.objects.filter(wikidata_entity__endswith=qid)
             for fact in facts_qs:
                 evidence_highlight = fact.evidence_highlight
+                meta_information = fact.meta_information
                 references = fact.references
+                evidence, wikipedia_link = None, None  # setting default values
                 for refer in references:
                     if refer.get("type") == "string":
                         evidence = refer.get("value")
@@ -35,7 +37,7 @@ class RetrieveFactWithQIdAPI(APIView):
                     {
                         "id": fact.id,
                         "property": fact.wikidata_property,
-                        "question": fact.question,
+                        "question": meta_information.get("question"),
                         "wikipediaLink": wikipedia_link,
                         "wikidataLink": fact.wikidata_entity,
                         "text": evidence_highlight.get("text"),
@@ -57,7 +59,9 @@ class RetrieveRandomFactAPI(APIView):
             random_pk = choice(pk_list)
             fact = Fact.objects.get(pk=random_pk)
             evidence_highlight = fact.evidence_highlight
+            meta_information = fact.meta_information
             references = fact.references
+            evidence, wikipedia_link = None, None  # setting default values
             for refer in references:
                 if refer.get("type") == "string":
                     evidence = refer.get("value")
@@ -66,7 +70,7 @@ class RetrieveRandomFactAPI(APIView):
             custom_response = {
                 "id": fact.id,
                 "property": fact.wikidata_property,
-                "question": fact.question,
+                "question": meta_information.get("question"),
                 "wikipediaLink": wikipedia_link,
                 "wikidataLink": fact.wikidata_entity,
                 "text": evidence_highlight.get("text"),

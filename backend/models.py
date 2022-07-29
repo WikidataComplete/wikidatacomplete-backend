@@ -17,6 +17,6 @@ class Fact(models.Model):
     shown_to_editors = models.IntegerField(default=0)
     confirmed_at = models.DateTimeField(auto_now=True)
     evidence_highlight = models.JSONField(default=dict)
-    editor_feedback = models.BooleanField(default=False)
     validated_by = models.CharField(max_length=100, blank=True, default="")
-    question = models.CharField(max_length=200, blank=True, default="")
+    meta_information = models.JSONField(default=dict)
+    feedback = models.JSONField(default=dict)
