@@ -1,10 +1,12 @@
+import json
+from random import choice
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from backend.models import Fact
 from backend.serializers import FactListCreateSerializer
-from random import choice
 
 
 class FactListCreateAPI(generics.ListCreateAPIView):
@@ -92,7 +94,16 @@ class FactAcceptAPI(APIView):
                 {"detail": "Invalid Fact ID."}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            pass
+            fact = Fact.objects.get(id=fact_id)
+            feedback = {
+                "value": True,
+                "date": timezone.now(),
+            }
+            # to avoid TypeError: Object of type datetime is not JSON serializable
+            feedback = json.dumps(feedback, cls=DjangoJSONEncoder)
+            feedback = json.loads(feedback)
+            fact.feedback = feedback
+            fact.save()
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(
@@ -108,7 +119,16 @@ class FactRejectAPI(APIView):
                 {"detail": "Invalid Fact ID."}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            pass
+            fact = Fact.objects.get(id=fact_id)
+            feedback = {
+                "value": False,
+                "date": timezone.now(),
+            }
+            # to avoid TypeError: Object of type datetime is not JSON serializable
+            feedback = json.dumps(feedback, cls=DjangoJSONEncoder)
+            feedback = json.loads(feedback)
+            fact.feedback = feedback
+            fact.save()
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(
