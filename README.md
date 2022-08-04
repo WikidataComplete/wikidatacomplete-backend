@@ -22,4 +22,5 @@ SECRET_KEY=""    (use django project secret key here, can be generated via https
 
 ## API Docs
 
-- http://localhost:8000/swagger/
+- https://datacompletewiki.toolforge.org/ (on live)
+- http://localhost:8000/ (on local)
