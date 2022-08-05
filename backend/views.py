@@ -24,7 +24,9 @@ class RetrieveFactWithQIdAPI(APIView):
         qid = self.kwargs.get("qid")
         try:
             custom_response = []
-            facts_qs = Fact.objects.filter(wikidata_entity__endswith=qid)
+            facts_qs = Fact.objects.filter(
+                wikidata_entity__endswith=qid, feedback__value=None
+            )  # only take those facts which have not received feedback yet
             for fact in facts_qs:
                 evidence_highlight = fact.evidence_highlight
                 meta_information = fact.meta_information
@@ -57,7 +59,9 @@ class RetrieveFactWithQIdAPI(APIView):
 class RetrieveRandomFactAPI(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            pk_list = Fact.objects.values_list("pk", flat=True)
+            pk_list = Fact.objects.filter(feedback__value=None).values_list(
+                "pk", flat=True
+            )  # only take those facts which have not received feedback yet
             random_pk = choice(pk_list)
             fact = Fact.objects.get(pk=random_pk)
             evidence_highlight = fact.evidence_highlight
