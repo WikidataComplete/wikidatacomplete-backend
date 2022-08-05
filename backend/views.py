@@ -14,11 +14,6 @@ class FactListCreateAPI(generics.ListCreateAPIView):
     serializer_class = FactListCreateSerializer
 
 
-class FactRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Fact.objects.all()
-    serializer_class = FactListCreateSerializer
-
-
 class RetrieveFactWithQIdAPI(APIView):
     def get(self, request, *args, **kwargs):
         qid = self.kwargs.get("qid")

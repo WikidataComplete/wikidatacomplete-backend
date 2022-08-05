@@ -3,14 +3,12 @@ from backend.views import (
     FactAcceptAPI,
     FactListCreateAPI,
     FactRejectAPI,
-    FactRetrieveUpdateDestroyAPI,
     RetrieveFactWithQIdAPI,
     RetrieveRandomFactAPI,
 )
 
 urlpatterns = [
     path("api/v1/facts/", FactListCreateAPI.as_view()),
-    path("api/v1/facts/<int:pk>/", FactRetrieveUpdateDestroyAPI.as_view()),
     path("api/v1/facts/random/", RetrieveRandomFactAPI.as_view()),
     path("api/v1/facts/accept/", FactAcceptAPI.as_view()),
     path("api/v1/facts/reject/", FactRejectAPI.as_view()),
