@@ -30,6 +30,7 @@ class ReferencesJSONField(serializers.JSONField):
                     "property": openapi.Schema(type=openapi.TYPE_STRING),
                     "value": openapi.Schema(type=openapi.TYPE_STRING),
                     "type": openapi.Schema(type=openapi.TYPE_STRING),
+                    "name": openapi.Schema(type=openapi.TYPE_STRING),
                 },
             ),
             "required": ["property", "value", "type"],

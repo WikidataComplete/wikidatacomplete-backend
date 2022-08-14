@@ -25,22 +25,14 @@ class RetrieveFactWithQIdAPI(APIView):
             for fact in facts_qs:
                 evidence_highlight = fact.evidence_highlight
                 meta_information = fact.meta_information
-                references = fact.references
-                evidence, wikipedia_link = None, None  # setting default values
-                for refer in references:
-                    if refer.get("type") == "string":
-                        evidence = refer.get("value")
-                    elif refer.get("type") == "url":
-                        wikipedia_link = refer.get("value")
                 custom_response.append(
                     {
                         "id": fact.id,
                         "property": fact.wikidata_property,
                         "question": meta_information.get("question"),
-                        "wikipediaLink": wikipedia_link,
                         "wikidataLink": fact.wikidata_entity,
+                        "references": fact.references,
                         "text": evidence_highlight.get("text"),
-                        "evidence": evidence,
                         "startIdx": evidence_highlight.get("startIdx"),
                         "endIdx": evidence_highlight.get("endIdx"),
                         "object": fact.data_value,
@@ -61,21 +53,13 @@ class RetrieveRandomFactAPI(APIView):
             fact = Fact.objects.get(pk=random_pk)
             evidence_highlight = fact.evidence_highlight
             meta_information = fact.meta_information
-            references = fact.references
-            evidence, wikipedia_link = None, None  # setting default values
-            for refer in references:
-                if refer.get("type") == "string":
-                    evidence = refer.get("value")
-                elif refer.get("type") == "url":
-                    wikipedia_link = refer.get("value")
             custom_response = {
                 "id": fact.id,
                 "property": fact.wikidata_property,
                 "question": meta_information.get("question"),
-                "wikipediaLink": wikipedia_link,
                 "wikidataLink": fact.wikidata_entity,
+                "references": fact.references,
                 "text": evidence_highlight.get("text"),
-                "evidence": evidence,
                 "startIdx": evidence_highlight.get("startIdx"),
                 "endIdx": evidence_highlight.get("endIdx"),
                 "object": fact.data_value,

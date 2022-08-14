@@ -28,11 +28,13 @@ class Command(BaseCommand):
                     "property": EVIDENCE_PROPERTY,
                     "value": data.get("evidence"),
                     "type": "string",
+                    "name": "evidence",
                 },
                 {
                     "property": WIKIPEDIALINK_PROPERTY,
                     "value": data.get("wikipediaLink"),
                     "type": "url",
+                    "name": "Wikimedia import URL",
                 },
             ]
             evidence_highlight = {
