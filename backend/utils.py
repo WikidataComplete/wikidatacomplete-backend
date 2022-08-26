@@ -3,7 +3,7 @@ def default_data_value():
 
 
 def default_references():
-    return [{"property": "", "value": "", "type": ""}]
+    return [{"property": "", "value": "", "type": "", "name": ""}]
 
 
 def default_evidence_highlight():
