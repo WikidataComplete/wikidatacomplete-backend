@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "backend",
+    "social_django",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "mysite.urls"
@@ -76,6 +78,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -143,3 +147,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.mediawiki.MediaWiki",
+    "django.contrib.auth.backends.ModelBackend",
+)
+SOCIAL_AUTH_MEDIAWIKI_KEY = env("SOCIAL_AUTH_MEDIAWIKI_KEY")
+SOCIAL_AUTH_MEDIAWIKI_SECRET = env("SOCIAL_AUTH_MEDIAWIKI_SECRET")
+SOCIAL_AUTH_MEDIAWIKI_URL = "https://meta.wikimedia.org/w/index.php"
+SOCIAL_AUTH_MEDIAWIKI_CALLBACK = "http://localhost:8000/oauth/complete/mediawiki/"
+
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "profile"

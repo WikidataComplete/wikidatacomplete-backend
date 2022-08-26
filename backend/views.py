@@ -1,7 +1,11 @@
 import json
 from random import choice
+from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views import View
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -135,3 +139,16 @@ class FactRejectAPI(APIView):
         return Response(
             {"message": "Fact Rejected successfully"}, status=status.HTTP_200_OK
         )
+
+
+@method_decorator(login_required, name="dispatch")
+class UserProfileView(View):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        return render(request, "backend/profile.html", context)
+
+
+class UserLoginView(View):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        return render(request, "backend/login.html", context)
