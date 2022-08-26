@@ -5,6 +5,8 @@ from backend.views import (
     FactRejectAPI,
     RetrieveFactWithQIdAPI,
     RetrieveRandomFactAPI,
+    UserProfileView,
+    UserLoginView,
 )
 
 urlpatterns = [
@@ -13,4 +15,6 @@ urlpatterns = [
     path("api/v1/facts/accept/", FactAcceptAPI.as_view()),
     path("api/v1/facts/reject/", FactRejectAPI.as_view()),
     path("api/v1/facts/<str:qid>/", RetrieveFactWithQIdAPI.as_view()),
+    path("profile", UserProfileView.as_view(), name="profile"),
+    path("accounts/login", UserLoginView.as_view(), name="login"),
 ]
