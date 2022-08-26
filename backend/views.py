@@ -44,6 +44,7 @@ class RetrieveFactWithQIdAPI(APIView):
                         "startIdx": evidence_highlight.get("startIdx"),
                         "endIdx": evidence_highlight.get("endIdx"),
                         "object": fact.data_value,
+                        "retrieved": fact.candidate_created_at,
                     }
                 )
         except Exception:
@@ -79,6 +80,7 @@ class RetrieveRandomFactAPI(APIView):
                 "startIdx": evidence_highlight.get("startIdx"),
                 "endIdx": evidence_highlight.get("endIdx"),
                 "object": fact.data_value,
+                "retrieved": fact.candidate_created_at,
             }
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
