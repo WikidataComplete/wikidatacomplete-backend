@@ -1,0 +1,35 @@
+.buttonStyle {
+    text-decoration: none;
+    border: none;
+    padding: 12px 40px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s all;
+}
+  
+.buttonStyle:active {
+    transform: scale(0.98);
+    /* Scaling button to 0.98 to its original size */
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+    /* Lowering the shadow */
+}
+
+.filePicker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+    border-width: 2;
+    border-radius: 2;
+    border-color: #af9696;
+    border-style: dashed;
+    background-color: #c8dadf;
+    color: #0f3c4b;
+    transition: border .3s ease-in-out;
+    margin: 80px 300px 40px;
+}
