@@ -18,17 +18,18 @@ class FileUpload extends Component {
   onDrop = (acceptedFiles) => {
     var uploadedFile = acceptedFiles[0];
     var filePath = uploadedFile.path;
-    var fileSize = uploadedFile.size / 1000;
-    this.setState({ pickerMessage: `${filePath} (${fileSize} kB)` });
+    var fileSize = uploadedFile.size / 1000000;
+    var roundSize = Math.round((fileSize + Number.EPSILON) * 10) / 10;
+    this.setState({ pickerMessage: `${filePath} (${roundSize} MB)` });
   };
 
   render() {
     return (
       <section className="container">
-        <div className="filePicker">
+        <div className="pickerContainer">
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps, isDragActive }) => (
-              <div {...getRootProps()}>
+              <div className="filePicker" {...getRootProps()}>
                 <input {...getInputProps()} />
                 <svg
                   className="box__icon"
