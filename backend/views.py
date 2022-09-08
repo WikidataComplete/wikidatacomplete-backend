@@ -152,3 +152,16 @@ class UserLoginView(View):
     def get(self, request, *args, **kwargs):
         context = {}
         return render(request, "backend/login.html", context)
+
+
+class FactUploadAPI(APIView):
+    def post(self, request, *args, **kwargs):
+        uploaded_file = request.data.get("file")
+        if uploaded_file == "null":
+            return Response(
+                {"detail": "Please upload file"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        data_list = [json.loads(line) for line in uploaded_file]
+        for data in data_list:
+            print(data)
+        return Response(status=status.HTTP_201_CREATED)

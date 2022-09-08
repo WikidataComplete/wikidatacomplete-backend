@@ -1,26 +1,36 @@
 import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import "./styles.css";
+import axios from "axios";
 
 class FileUpload extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pickerMessage: "Click me or drag a file to upload!",
+      uploadedFile: null,
     };
   }
 
   handleUpload = (e) => {
     e.preventDefault();
-    console.log("The link was clicked.");
+    const baseUrl = process.env.REACT_APP_BASE_URL;
+    const formData = new FormData();
+    formData.append("file", this.state.uploadedFile);
+    axios.post(`${baseUrl}api/v1/facts/upload/`, formData, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
   };
 
   onDrop = (acceptedFiles) => {
-    var uploadedFile = acceptedFiles[0];
-    var filePath = uploadedFile.path;
-    var fileSize = uploadedFile.size / 1000000;
-    var roundSize = Math.round((fileSize + Number.EPSILON) * 10) / 10;
-    this.setState({ pickerMessage: `${filePath} (${roundSize} MB)` });
+    const uploadedFile = acceptedFiles[0];
+    const filePath = uploadedFile.path;
+    const fileSize =
+      Math.round((uploadedFile.size / 1000000 + Number.EPSILON) * 10) / 10;
+    this.setState({ pickerMessage: `${filePath} (${fileSize} MB)` });
+    this.setState({ uploadedFile: uploadedFile });
   };
 
   render() {
