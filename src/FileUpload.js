@@ -9,6 +9,8 @@ class FileUpload extends Component {
     this.state = {
       pickerMessage: "Click me or drag a file to upload!",
       uploadedFile: null,
+      items: [],
+      errorMessage: "",
     };
   }
 
@@ -17,11 +19,22 @@ class FileUpload extends Component {
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const formData = new FormData();
     formData.append("file", this.state.uploadedFile);
-    axios.post(`${baseUrl}api/v1/facts/upload/`, formData, {
-      headers: {
-        "content-type": "multipart/form-data",
-      },
-    });
+    axios
+      .post(`${baseUrl}api/v1/facts/upload/`, formData, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      })
+      .then(
+        (response) => {
+          this.setState({ items: response.data });
+          console.log(response);
+        },
+        (error) => {
+          this.setState({ errorMessage: error.message });
+          console.log(error);
+        }
+      );
   };
 
   onDrop = (acceptedFiles) => {
@@ -36,6 +49,9 @@ class FileUpload extends Component {
   render() {
     return (
       <section className="container">
+        {this.state.errorMessage && (
+          <h3 className="error"> {this.state.errorMessage} </h3>
+        )}
         <div className="pickerContainer">
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps, isDragActive }) => (

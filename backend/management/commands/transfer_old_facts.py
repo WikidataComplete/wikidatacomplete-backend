@@ -75,13 +75,9 @@ class Command(BaseCommand):
                     evidence_highlight=evidence_highlight,
                     feedback=feedback,
                 )
-                facts_to_create.append(fact_object)
+                fact_object.save()
             except Exception as e:
                 error_logs.append({"entity": data.get("wikidataLink"), "error": e})
-        try:
-            Fact.objects.bulk_create(facts_to_create)
-        except Exception as e:
-            print(f"Exception while creating fact records in bulk: {e}")
         if error_logs:
             print("Facts not created for these rows:")
             print(error_logs)

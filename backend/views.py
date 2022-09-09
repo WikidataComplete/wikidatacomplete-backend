@@ -175,9 +175,14 @@ class FactUploadAPI(APIView):
             return Response(
                 {"detail": "Please upload file"}, status=status.HTTP_400_BAD_REQUEST
             )
+        extension = str(uploaded_file).split(".")[-1]
+        if extension != "jsonl":
+            return Response(
+                {"detail": "Only .jsonl file format is supported"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         data_list = [json.loads(line) for line in uploaded_file]
-        # TODO: file extension validation
-        facts_to_create, error_logs = [], []
+        error_logs = []
         for data in data_list:
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
@@ -185,17 +190,19 @@ class FactUploadAPI(APIView):
                 try:
                     fact_object = Fact(
                         entity=validated_data.get("entity"),
-                        wikidata_property=validated_data.get("wikidata_property"),
-                        data_type="Item",
-                        evidence_highlight=validated_data.evidence_highlight,
-                        references=validated_data.references,
-                        data_value=validated_data.get("object"),
+                        property_data=validated_data.get("property_data"),
+                        value_data=validated_data.get("value_data"),
+                        references=validated_data.get("references"),
                     )
-                    facts_to_create.append(fact_object)
+                    if validated_data.get("evidence_highlight"):
+                        fact_object.evidence_highlight = validated_data.get(
+                            "evidence_highlight"
+                        )
+                    fact_object.save()
                 except Exception as e:
                     error_logs.append(
                         {
-                            "entity": validated_data.get("wikidataLink"),
+                            "entity": validated_data.get("entity"),
                             "error": e,
                         }
                     )
@@ -203,8 +210,6 @@ class FactUploadAPI(APIView):
                 return Response(
                     {"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
                 )
-        try:
-            Fact.objects.bulk_create(facts_to_create)
-        except Exception as e:
-            print(f"Exception while creating fact records in bulk: {e}")
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(
+            {"detail": "Facts uploaded successfully"}, status=status.HTTP_201_CREATED
+        )

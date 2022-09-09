@@ -28,3 +28,6 @@ class Fact(models.Model):
     )
     validated_by = models.CharField(max_length=100, blank=True, default="")
     feedback = models.JSONField(default=default_feedback)
+
+    class Meta:
+        unique_together = ("entity", "property_data", "value_data")
