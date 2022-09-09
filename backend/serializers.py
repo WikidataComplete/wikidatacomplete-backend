@@ -1,22 +1,29 @@
-from dataclasses import field
 from rest_framework import serializers
 from backend.models import Fact
 from drf_yasg import openapi
 
 
-class DataValueJSONField(serializers.JSONField):
+class PropertyDataJSONField(serializers.JSONField):
     class Meta:
         swagger_schema_fields = {
-            "type": openapi.TYPE_ARRAY,
-            "items": openapi.Items(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                    "object": openapi.Schema(type=openapi.TYPE_STRING),
-                    "objectLabel": openapi.Schema(type=openapi.TYPE_STRING),
-                },
-            ),
-            "required": ["id", "object", "objectLabel"],
+            "type": openapi.TYPE_OBJECT,
+            "properties": {
+                "property": openapi.Schema(type=openapi.TYPE_STRING),
+                "value": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+            "required": ["property", "value"],
+        }
+
+
+class ValueDataJSONField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            "type": openapi.TYPE_OBJECT,
+            "properties": {
+                "entity": openapi.Schema(type=openapi.TYPE_STRING),
+                "value": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+            "required": ["entity", "value"],
         }
 
 
@@ -41,22 +48,9 @@ class EvidenceHighlightJSONField(serializers.JSONField):
         swagger_schema_fields = {
             "type": openapi.TYPE_OBJECT,
             "properties": {
-                "startIdx": openapi.Schema(type=openapi.TYPE_INTEGER),
-                "endIdx": openapi.Schema(type=openapi.TYPE_INTEGER),
-                "text": openapi.Schema(type=openapi.TYPE_STRING),
+                "start_index": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "end_index": openapi.Schema(type=openapi.TYPE_INTEGER),
             },
-            "required": ["startIdx", "endIdx", "text"],
-        }
-
-
-class MetaInformationJSONField(serializers.JSONField):
-    class Meta:
-        swagger_schema_fields = {
-            "type": openapi.TYPE_OBJECT,
-            "properties": {
-                "question": openapi.Schema(type=openapi.TYPE_STRING),
-            },
-            "required": ["question"],
         }
 
 
@@ -68,10 +62,10 @@ class FactListCreateSerializer(serializers.ModelSerializer):
             "user_id",
             "namespace",
             "namespace_item_id",
-            "candidate_created_at",
-            "wikidata_entity",
-            "wikidata_property",
-            "data_value",
+            "created_at",
+            "entity",
+            "property_data",
+            "value_data",
             "data_type",
             "qualifiers",
             "references",
@@ -79,7 +73,6 @@ class FactListCreateSerializer(serializers.ModelSerializer):
             "confirmed_at",
             "evidence_highlight",
             "validated_by",
-            "meta_information",
             "feedback",
         )
         read_only_fields = (
@@ -87,15 +80,16 @@ class FactListCreateSerializer(serializers.ModelSerializer):
             "user_id",
             "namespace",
             "namespace_item_id",
-            "candidate_created_at",
+            "created_at",
             "qualifiers",
             "shown_to_editors",
             "confirmed_at",
             "validated_by",
             "feedback",
+            "data_type",
         )
 
-    data_value = DataValueJSONField()
+    property_data = PropertyDataJSONField()
+    value_data = ValueDataJSONField()
     references = ReferencesJSONField()
-    evidence_highlight = EvidenceHighlightJSONField()
-    meta_information = MetaInformationJSONField()
+    evidence_highlight = EvidenceHighlightJSONField(allow_null=True, required=False)

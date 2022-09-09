@@ -30,9 +30,9 @@ def fix_p407_facts():
     delete_count = 0
     facts_to_delete = []
     errored_api_calls = []
-    p407_facts = Fact.objects.filter(wikidata_property=LANGUAGE_OF_WORK)
+    p407_facts = Fact.objects.filter(property_data__property=LANGUAGE_OF_WORK)
     for fact in tqdm(p407_facts):
-        qid = fact.wikidata_entity.split("/")[-1]
+        qid = fact.entity
         uri = WIKIDATA_API_URI.format(qid=qid)
         response = requests.get(uri)
         if response.status_code == 200:

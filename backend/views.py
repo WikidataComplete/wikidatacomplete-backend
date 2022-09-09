@@ -24,11 +24,12 @@ class RetrieveFactWithQIdAPI(APIView):
         try:
             custom_response = []
             facts_qs = Fact.objects.filter(
-                wikidata_entity__endswith=qid, feedback__value=None
+                entity=qid, feedback__value=None
             )  # only take those facts which have not received feedback yet
             for fact in facts_qs:
                 evidence_highlight = fact.evidence_highlight
-                meta_information = fact.meta_information
+                property_data = fact.property_data
+                value_data = fact.value_data
                 references = fact.references
                 evidence, wikipedia_link = None, None  # setting default values
                 for refer in references:
@@ -39,16 +40,21 @@ class RetrieveFactWithQIdAPI(APIView):
                 custom_response.append(
                     {
                         "id": fact.id,
-                        "property": fact.wikidata_property,
-                        "question": meta_information.get("question"),
+                        "property": property_data.get("property"),
+                        "question": property_data.get("value"),
                         "wikipediaLink": wikipedia_link,
-                        "wikidataLink": fact.wikidata_entity,
-                        "text": evidence_highlight.get("text"),
+                        "wikidataLink": f"http://www.wikidata.org/entity/{fact.entity}",
+                        "text": value_data.get("value"),
                         "evidence": evidence,
-                        "startIdx": evidence_highlight.get("startIdx"),
-                        "endIdx": evidence_highlight.get("endIdx"),
-                        "object": fact.data_value,
-                        "retrieved": fact.candidate_created_at,
+                        "startIdx": evidence_highlight.get("start_index"),
+                        "endIdx": evidence_highlight.get("end_index"),
+                        "object": [
+                            {
+                                "object": value_data.get("entity"),
+                                "objectLabel": value_data.get("value"),
+                            }
+                        ],
+                        "retrieved": fact.created_at,
                     }
                 )
         except Exception:
@@ -65,7 +71,8 @@ class RetrieveRandomFactAPI(APIView):
             random_pk = choice(pk_list)
             fact = Fact.objects.get(pk=random_pk)
             evidence_highlight = fact.evidence_highlight
-            meta_information = fact.meta_information
+            property_data = fact.property_data
+            value_data = fact.value_data
             references = fact.references
             evidence, wikipedia_link = None, None  # setting default values
             for refer in references:
@@ -75,16 +82,21 @@ class RetrieveRandomFactAPI(APIView):
                     wikipedia_link = refer.get("value")
             custom_response = {
                 "id": fact.id,
-                "property": fact.wikidata_property,
-                "question": meta_information.get("question"),
+                "property": property_data.get("property"),
+                "question": property_data.get("value"),
                 "wikipediaLink": wikipedia_link,
-                "wikidataLink": fact.wikidata_entity,
-                "text": evidence_highlight.get("text"),
+                "wikidataLink": f"http://www.wikidata.org/entity/{fact.entity}",
+                "text": value_data.get("value"),
                 "evidence": evidence,
-                "startIdx": evidence_highlight.get("startIdx"),
-                "endIdx": evidence_highlight.get("endIdx"),
-                "object": fact.data_value,
-                "retrieved": fact.candidate_created_at,
+                "startIdx": evidence_highlight.get("start_index"),
+                "endIdx": evidence_highlight.get("end_index"),
+                "object": [
+                    {
+                        "object": value_data.get("entity"),
+                        "objectLabel": value_data.get("value"),
+                    }
+                ],
+                "retrieved": fact.created_at,
             }
         except Exception:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -155,6 +167,8 @@ class UserLoginView(View):
 
 
 class FactUploadAPI(APIView):
+    serializer_class = FactListCreateSerializer
+
     def post(self, request, *args, **kwargs):
         uploaded_file = request.data.get("file")
         if uploaded_file == "null":
@@ -162,6 +176,35 @@ class FactUploadAPI(APIView):
                 {"detail": "Please upload file"}, status=status.HTTP_400_BAD_REQUEST
             )
         data_list = [json.loads(line) for line in uploaded_file]
+        # TODO: file extension validation
+        facts_to_create, error_logs = [], []
         for data in data_list:
-            print(data)
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                validated_data = serializer.validated_data
+                try:
+                    fact_object = Fact(
+                        entity=validated_data.get("entity"),
+                        wikidata_property=validated_data.get("wikidata_property"),
+                        data_type="Item",
+                        evidence_highlight=validated_data.evidence_highlight,
+                        references=validated_data.references,
+                        data_value=validated_data.get("object"),
+                    )
+                    facts_to_create.append(fact_object)
+                except Exception as e:
+                    error_logs.append(
+                        {
+                            "entity": validated_data.get("wikidataLink"),
+                            "error": e,
+                        }
+                    )
+            else:
+                return Response(
+                    {"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+                )
+        try:
+            Fact.objects.bulk_create(facts_to_create)
+        except Exception as e:
+            print(f"Exception while creating fact records in bulk: {e}")
         return Response(status=status.HTTP_201_CREATED)
