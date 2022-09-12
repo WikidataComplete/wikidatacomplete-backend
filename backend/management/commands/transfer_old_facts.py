@@ -23,6 +23,16 @@ class Command(BaseCommand):
         facts_to_create = []
         error_logs = []
         for data in tqdm(data_list):
+            property_data = {
+                "property": data.get("property"),
+                "value": data.get("question"),
+            }
+
+            value_data = {
+                "entity": data.get("object")[0].get("object").split("/")[-1],
+                "value": data.get("object")[0].get("objectLabel"),
+            }
+
             references = [
                 {
                     "property": EVIDENCE_PROPERTY,
@@ -35,12 +45,11 @@ class Command(BaseCommand):
                     "type": "url",
                 },
             ]
+
             evidence_highlight = {
-                "startIdx": data.get("startIdx"),
-                "endIdx": data.get("endIdx"),
-                "text": data.get("text"),
+                "start_index": data.get("startIdx"),
+                "end_index": data.get("endIdx"),
             }
-            meta_information = {"question": data.get("question")}
 
             # caculation for feedback
             if data.get("published") is not None:
@@ -58,24 +67,17 @@ class Command(BaseCommand):
 
             try:
                 fact_object = Fact(
-                    wikidata_entity=data.get("wikidataLink"),
-                    wikidata_property=data.get("property"),
+                    entity=data.get("wikidataLink").split("/")[-1],
+                    property_data=property_data,
+                    value_data=value_data,
                     data_type="Item",
-                    evidence_highlight=evidence_highlight,
                     references=references,
-                    data_value=data.get("object"),
-                    meta_information=meta_information,
+                    evidence_highlight=evidence_highlight,
                     feedback=feedback,
                 )
-                facts_to_create.append(fact_object)
+                fact_object.save()
             except Exception as e:
-                error_logs.append(
-                    {"wikidata_entity": data.get("wikidataLink"), "error": e}
-                )
-        try:
-            Fact.objects.bulk_create(facts_to_create)
-        except Exception as e:
-            print(f"Exception while creating fact records in bulk: {e}")
+                error_logs.append({"entity": data.get("wikidataLink"), "error": e})
         if error_logs:
             print("Facts not created for these rows:")
             print(error_logs)

@@ -1,5 +1,9 @@
-def default_data_value():
-    return [{"id": None, "object": "", "objectLabel": ""}]
+def default_property_data():
+    return {"property": "", "value": ""}
+
+
+def default_value_data():
+    return {"entity": "", "value": ""}
 
 
 def default_references():
@@ -7,11 +11,7 @@ def default_references():
 
 
 def default_evidence_highlight():
-    return {"startIdx": None, "endIdx": None, "text": ""}
-
-
-def default_meta_information():
-    return {"question": ""}
+    return {"start_index": None, "end_index": None}
 
 
 def default_feedback():

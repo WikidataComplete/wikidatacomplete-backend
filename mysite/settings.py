@@ -33,8 +33,19 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["toolforge.org", "localhost", "datacompletewiki.toolforge.org"]
-CORS_ALLOWED_ORIGINS = ["https://www.wikidata.org"]
+ALLOWED_HOSTS = [
+    "toolforge.org",
+    "localhost",
+    "datacompletewiki.toolforge.org",
+    "localhost:3000",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://toolforge.org",
+    "https://datacompletewiki.toolforge.org",
+    "http://localhost:3000",
+    "https://www.wikidata.org",
+]
 
 
 # Application definition
