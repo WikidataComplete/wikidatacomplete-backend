@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import "./styles.css";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 class FileUpload extends Component {
   constructor(props) {
@@ -9,8 +11,6 @@ class FileUpload extends Component {
     this.state = {
       pickerMessage: "Click me or drag a file to upload!",
       uploadedFile: null,
-      items: [],
-      errorMessage: "",
     };
   }
 
@@ -27,12 +27,28 @@ class FileUpload extends Component {
       })
       .then(
         (response) => {
-          this.setState({ items: response.data });
-          console.log(response);
+          toast.success(response.data.detail, {
+            position: toast.POSITION.TOP_CENTER,
+          });
         },
         (error) => {
-          this.setState({ errorMessage: error.message });
-          console.log(error);
+          var errorMessage = "";
+          if (typeof error.response.data.detail === "string") {
+            errorMessage = error.response.data.detail;
+            toast.error(errorMessage, {
+              position: toast.POSITION.TOP_CENTER,
+            });
+          } else if (typeof error.response.data.detail === "object") {
+            const errorObject = error.response.data.detail;
+            for (var key in errorObject) {
+              if (errorObject.hasOwnProperty(key)) {
+                errorMessage = `${key}: ${errorObject[key]}`;
+                toast.error(errorMessage, {
+                  position: toast.POSITION.TOP_CENTER,
+                });
+              }
+            }
+          }
         }
       );
   };
@@ -42,16 +58,19 @@ class FileUpload extends Component {
     const filePath = uploadedFile.path;
     const fileSize =
       Math.round((uploadedFile.size / 1000000 + Number.EPSILON) * 10) / 10;
-    this.setState({ pickerMessage: `${filePath} (${fileSize} MB)` });
-    this.setState({ uploadedFile: uploadedFile });
+    if (fileSize > 5) {
+      toast.error("File size greater than 5 MB not allowed", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    } else {
+      this.setState({ pickerMessage: `${filePath} (${fileSize} MB)` });
+      this.setState({ uploadedFile: uploadedFile });
+    }
   };
 
   render() {
     return (
       <section className="container">
-        {this.state.errorMessage && (
-          <h3 className="error"> {this.state.errorMessage} </h3>
-        )}
         <div className="pickerContainer">
           <Dropzone onDrop={this.onDrop}>
             {({ getRootProps, getInputProps, isDragActive }) => (
@@ -73,9 +92,12 @@ class FileUpload extends Component {
             )}
           </Dropzone>
         </div>
-        <button className="buttonStyle" onClick={this.handleUpload}>
-          Donate!
-        </button>
+        <div>
+          <button className="buttonStyle" onClick={this.handleUpload}>
+            Donate!
+          </button>
+          <ToastContainer />
+        </div>
       </section>
     );
   }
