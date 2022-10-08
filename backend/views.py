@@ -1,8 +1,9 @@
 import json
 from random import choice
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -166,6 +167,13 @@ class UserLoginView(View):
         return render(request, "backend/login.html", context)
 
 
+@method_decorator(login_required, name="dispatch")
+class UserLogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect("login")
+
+
 class FactUploadAPI(APIView):
     serializer_class = FactListCreateSerializer
 
@@ -213,3 +221,8 @@ class FactUploadAPI(APIView):
         return Response(
             {"detail": "Facts uploaded successfully"}, status=status.HTTP_201_CREATED
         )
+
+
+@method_decorator(login_required, name="dispatch")
+class DashboardView(View):
+    pass

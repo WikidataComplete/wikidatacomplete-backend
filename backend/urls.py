@@ -7,7 +7,9 @@ from backend.views import (
     RetrieveRandomFactAPI,
     UserProfileView,
     UserLoginView,
+    UserLogoutView,
     FactUploadAPI,
+    DashboardView,
 )
 
 urlpatterns = [
@@ -20,5 +22,7 @@ urlpatterns = [
     # django will match str: to this and this api will get called
     path("api/v1/facts/<str:qid>/", RetrieveFactWithQIdAPI.as_view()),
     path("profile/", UserProfileView.as_view(), name="profile"),
-    path("accounts/login", UserLoginView.as_view(), name="login"),
+    path("accounts/login/", UserLoginView.as_view(), name="login"),
+    path("accounts/logout/", UserLogoutView.as_view(), name="logout"),
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),
 ]

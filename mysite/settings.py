@@ -165,9 +165,15 @@ AUTHENTICATION_BACKENDS = (
 )
 SOCIAL_AUTH_MEDIAWIKI_KEY = env("SOCIAL_AUTH_MEDIAWIKI_KEY")
 SOCIAL_AUTH_MEDIAWIKI_SECRET = env("SOCIAL_AUTH_MEDIAWIKI_SECRET")
-SOCIAL_AUTH_MEDIAWIKI_URL = "https://meta.wikimedia.org/w/index.php"
+SOCIAL_AUTH_MEDIAWIKI_URL = "https://www.wikidata.org/w/index.php"
 SOCIAL_AUTH_MEDIAWIKI_CALLBACK = "http://localhost:8000/oauth/complete/mediawiki/"
 
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "profile"
+SESSION_COOKIE_AGE = 3600  # one hour in seconds
+
+
+# fix for wikidata login issue do not remove
+# ref: https://github.com/python-social-auth/social-core/issues/690
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ["groups"]
