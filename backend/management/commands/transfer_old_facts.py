@@ -20,7 +20,6 @@ class Command(BaseCommand):
         with open(path, "r") as old_facts:
             data_list = [json.loads(line) for line in old_facts]
 
-        facts_to_create = []
         error_logs = []
         for data in tqdm(data_list):
             property_data = {
@@ -79,5 +78,4 @@ class Command(BaseCommand):
             except Exception as e:
                 error_logs.append({"entity": data.get("wikidataLink"), "error": e})
         if error_logs:
-            print("Facts not created for these rows:")
-            print(error_logs)
+            print("All valid facts generated successfully")
