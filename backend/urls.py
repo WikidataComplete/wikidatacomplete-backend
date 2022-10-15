@@ -10,6 +10,7 @@ from backend.views import (
     UserLogoutView,
     FactUploadAPI,
     DashboardView,
+    DonateView,
 )
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
     path("accounts/login/", UserLoginView.as_view(), name="login"),
     path("accounts/logout/", UserLogoutView.as_view(), name="logout"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
+    path("donate/", DonateView.as_view(), name="donate"),
 ]

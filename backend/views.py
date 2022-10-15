@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from backend.models import Fact
 from backend.serializers import FactListCreateSerializer
+from django.views.generic.base import TemplateView
 
 
 class FactListCreateAPI(generics.ListCreateAPIView):
@@ -223,6 +224,10 @@ class FactUploadAPI(APIView):
         )
 
 
-@method_decorator(login_required, name="dispatch")
-class DashboardView(View):
-    pass
+# @method_decorator(login_required, name="dispatch")
+class DashboardView(TemplateView):
+    template_name = "backend/coming_soon.html"
+
+
+class DonateView(TemplateView):
+    template_name = "backend/coming_soon.html"
